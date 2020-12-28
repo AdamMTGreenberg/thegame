@@ -17,7 +17,6 @@ class MainApplication : Application() {
         appComponent = initDagger(this)
         initStetho()
         initTimber()
-//        InternetUtil.init(this)
     }
 
     private fun initDagger(mainApplication: MainApplication): AppComponent {
