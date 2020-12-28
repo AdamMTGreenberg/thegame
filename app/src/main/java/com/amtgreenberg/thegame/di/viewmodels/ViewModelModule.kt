@@ -1,4 +1,4 @@
-package com.amtgreenberg.thegame.di
+package com.amtgreenberg.thegame.di.viewmodels
 
 import androidx.lifecycle.ViewModelProvider
 import dagger.Module

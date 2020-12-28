@@ -2,7 +2,7 @@ package com.amtgreenberg.thegame.di.module
 
 import android.app.Application
 import android.content.Context
-import com.amtgreenberg.thegame.di.ViewModelModule
+import com.amtgreenberg.thegame.di.viewmodels.ViewModelModule
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
