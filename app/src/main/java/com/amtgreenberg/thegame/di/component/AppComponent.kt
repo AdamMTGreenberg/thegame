@@ -5,5 +5,4 @@ import javax.inject.Singleton
 
 @Singleton
 @Component
-interface AppComponent {
-}
+interface AppComponent

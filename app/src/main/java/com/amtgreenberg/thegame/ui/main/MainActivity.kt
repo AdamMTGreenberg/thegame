@@ -1,7 +1,7 @@
 package com.amtgreenberg.thegame.ui.main
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.amtgreenberg.thegame.R
 
 class MainActivity : AppCompatActivity() {
