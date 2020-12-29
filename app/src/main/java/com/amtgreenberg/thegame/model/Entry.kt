@@ -7,7 +7,7 @@ import java.io.Serializable
 import java.time.OffsetDateTime
 
 @Entity(
-    tableName = "entry",
+    tableName = "Entry",
     primaryKeys = ["entry_number"],
     indices = [Index(value = ["entry_number", "is_valid"])]
 )
