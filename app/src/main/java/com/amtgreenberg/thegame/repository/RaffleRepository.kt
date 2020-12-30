@@ -13,7 +13,8 @@ interface RaffleRepository {
     suspend fun addParticipant(participant: Participant): ResultData<Participant>
     suspend fun addParticipantEntries(
         participant: Participant,
-        entryIds: List<Int>
+        entryIds: List<Int>,
+        offsetMonthEntries: Int = 0
     ): ResultData<List<Entry>>
 
     suspend fun obtainRaffleWinner(shouldFinalizeAfterSelection: Boolean = true): ResultData<Entry>
