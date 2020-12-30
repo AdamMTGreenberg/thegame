@@ -10,7 +10,7 @@ import com.amtgreenberg.thegame.model.Participant
 interface RaffleRepository {
 
     suspend fun addEntry(participant: Participant): ResultData<Entry>
-    suspend fun addParticipant(name: Participant): ResultData<Entry>
+    suspend fun addParticipant(participant: Participant): ResultData<Participant>
     suspend fun addParticipantEntries(
         participant: Participant,
         entryIds: List<Int>

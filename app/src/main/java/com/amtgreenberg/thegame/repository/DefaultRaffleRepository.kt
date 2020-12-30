@@ -23,6 +23,12 @@ class DefaultRaffleRepository(
     override suspend fun addEntry(participant: Participant): ResultData<Entry> {
         return try {
             val nextEntry = raffleDao.getLastEntry() + 1
+
+            // If no entries exist, add the participant
+            if (raffleDao.getParticipantEntries(participant.name).isEmpty()) {
+                addParticipant(participant)
+            }
+
             val entry = Entry(nextEntry, participant.name, OffsetDateTime.now())
             withContext(ioDispatcher) { raffleDao.insertEntry(entry) }
             ResultData.Success(entry)
@@ -31,8 +37,13 @@ class DefaultRaffleRepository(
         }
     }
 
-    override suspend fun addParticipant(name: Participant): ResultData<Entry> {
-        TODO("Not yet implemented")
+    override suspend fun addParticipant(participant: Participant): ResultData<Participant> {
+        return try {
+            withContext(ioDispatcher) { raffleDao.insertParticipant(participant) }
+            ResultData.Success(participant)
+        } catch (e: Exception) {
+            ResultData.Error(e)
+        }
     }
 
     override suspend fun addParticipantEntries(
