@@ -65,7 +65,7 @@ class DefaultRaffleRepository(
                 val entry = Entry(
                     entryNumber = entryId,
                     participantName = participant.name,
-                    date = OffsetDateTime.from(beginningMonth.minus(index.toLong()))
+                    date = OffsetDateTime.from(beginningMonth.minus(index.toLong())) // TODO test that subtracting a month at the end of March wouldn't skip February
                 )
                 withContext(ioDispatcher) { raffleDao.insertEntry(entry) }
                 entry
