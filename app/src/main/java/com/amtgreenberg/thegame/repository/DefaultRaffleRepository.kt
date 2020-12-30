@@ -8,10 +8,8 @@ import com.amtgreenberg.thegame.model.Entry
 import com.amtgreenberg.thegame.model.Participant
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 import java.time.Month
 import java.time.OffsetDateTime
-import kotlin.random.Random
 
 /**
  * Default implementation of the repository: [RaffleRepository]. This handles all the logical
@@ -93,37 +91,50 @@ class DefaultRaffleRepository(
 
             // If we want to finalize this, set all the winner's previous entries to invalid
             if (shouldFinalizeAfterSelection) {
-                withContext(ioDispatcher) {
-                    raffleDao.updateEntry(
-                        Entry(
-                            winner.entryNumber,
-                            winner.participantName,
-                            winner.date,
-                            false,
-                            dateWon = now
-                        )
-                    )
-                    raffleEntries
-                        .stream()
-                        .filter {
-                            it.participantName == winner.participantName && it.entryNumber != winner.entryNumber
-                        }
-                        .forEach {
-                            raffleDao.updateEntry(
-                                Entry(
-                                    it.entryNumber,
-                                    it.participantName,
-                                    it.date,
-                                    false
-                                )
-                            )
-                        }
-                }
+                invalidateOldEntries(raffleEntries, winner, now)
             }
 
             ResultData.Success(winner)
         } catch (e: Exception) {
             ResultData.Error(e)
+        }
+    }
+
+    /**
+     * Updates the raffle [Entry]s for the winner. Marks the current winning [Entry] as the winner &
+     * then marks all other historic & current [Entry]s for the [Participant] who won as invalid.
+     */
+    @VisibleForTesting
+    internal suspend fun invalidateOldEntries(
+        raffleEntries: List<Entry>,
+        winner: Entry,
+        now: OffsetDateTime
+    ) {
+        withContext(ioDispatcher) {
+            raffleDao.updateEntry(
+                Entry(
+                    winner.entryNumber,
+                    winner.participantName,
+                    winner.date,
+                    false,
+                    dateWon = now
+                )
+            )
+            raffleEntries
+                .stream()
+                .filter {
+                    it.participantName == winner.participantName && it.entryNumber != winner.entryNumber
+                }
+                .forEach {
+                    raffleDao.updateEntry(
+                        Entry(
+                            it.entryNumber,
+                            it.participantName,
+                            it.date,
+                            false
+                        )
+                    )
+                }
         }
     }
 
