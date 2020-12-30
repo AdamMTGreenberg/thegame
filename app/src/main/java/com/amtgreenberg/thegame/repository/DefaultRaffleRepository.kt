@@ -1,5 +1,6 @@
 package com.amtgreenberg.thegame.repository
 
+import androidx.annotation.VisibleForTesting
 import com.amtgreenberg.thegame.data.ResultData
 import com.amtgreenberg.thegame.datasource.local.RaffleDao
 import com.amtgreenberg.thegame.di.IoDispatcher
@@ -81,20 +82,13 @@ class DefaultRaffleRepository(
     override suspend fun obtainRaffleWinner(shouldFinalizeAfterSelection: Boolean): ResultData<Entry> {
         return try {
             val now = OffsetDateTime.now()
-            val lastMonth = now.month.minus(1L)
-            val thisMonthsEntries = raffleDao.getValidEntries().filter {
-                it.date.isAfter(OffsetDateTime.from(lastMonth))
-            }
+            val lastMonth = getLastMonth(now)
+            val thisMonthsEntries = getThisMonthsEntries(lastMonth)
 
             // Build the set of entries
-            val raffleEntries = thisMonthsEntries.toMutableList().apply {
-                thisMonthsEntries.forEach {
-                    addAll(
-                        raffleDao.getActiveParticipantEntries(it.participantName)
-                    )
-                }
-            }
+            val raffleEntries = getAllOfThisMonthsEntries(thisMonthsEntries)
 
+            // Select a winner
             val winner = getWinner(raffleEntries)
 
             // If we want to finalize this, set all the winner's previous entries to invalid
@@ -133,7 +127,38 @@ class DefaultRaffleRepository(
         }
     }
 
-    private fun getWinner(raffleEntries: MutableList<Entry>): Entry = raffleEntries.random()
+    /**
+     * Obtains a the last month
+     */
+    @VisibleForTesting
+    internal fun getLastMonth(now: OffsetDateTime) = now.month.minus(1L)
+
+    /**
+     * Obtains a list of the current month's entries
+     */
+    @VisibleForTesting
+    internal suspend fun getThisMonthsEntries(lastMonth: Month): List<Entry> =
+        raffleDao.getValidEntries().filter {
+            it.date.isAfter(OffsetDateTime.from(lastMonth))
+        }
+
+    /**
+     * Obtains a list of the current month's entries including historical entries
+     */
+    @VisibleForTesting
+    internal suspend fun getAllOfThisMonthsEntries(thisMonthsEntries: List<Entry>): List<Entry> =
+        mutableListOf<Entry>().apply {
+            thisMonthsEntries.forEach {
+                addAll(
+                    raffleDao.getActiveParticipantEntries(it.participantName)
+                )
+            }
+        }
+
+    /**
+     * Simple method to obtain a winner
+     */
+    private fun getWinner(raffleEntries: List<Entry>): Entry = raffleEntries.random()
 
     /**
      * Ensure that the list of entry IDs is sorted correctly
@@ -147,7 +172,8 @@ class DefaultRaffleRepository(
      * allows us to gate by simple [Entry] is in current month check, and then pull all of those
      * [Participant]'s entries for the raffle.
      */
-    private fun getBeginningMonth(offsetMonthEntries: Int): Month {
+    @VisibleForTesting
+    internal fun getBeginningMonth(offsetMonthEntries: Int): Month {
         val currentMonth = OffsetDateTime.now().month
         return currentMonth.minus(offsetMonthEntries.toLong())
     }
