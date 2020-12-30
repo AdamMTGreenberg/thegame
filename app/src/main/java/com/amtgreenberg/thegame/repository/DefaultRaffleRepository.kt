@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.time.Month
 import java.time.OffsetDateTime
+import kotlin.random.Random
 
 /**
  * Default implementation of the repository: [RaffleRepository]. This handles all the logical
@@ -132,9 +133,7 @@ class DefaultRaffleRepository(
         }
     }
 
-    private fun getWinner(raffleEntries: MutableList<Entry>): Entry {
-
-    }
+    private fun getWinner(raffleEntries: MutableList<Entry>): Entry = raffleEntries.random()
 
     /**
      * Ensure that the list of entry IDs is sorted correctly
