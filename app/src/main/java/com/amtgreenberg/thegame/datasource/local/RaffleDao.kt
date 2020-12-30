@@ -22,6 +22,9 @@ interface RaffleDao {
     @Query("SELECT * FROM Entry")
     suspend fun getEntries(): List<Entry>
 
+    @Query("SELECT * FROM Entry ORDER BY entry_number DESC LIMIT 1")
+    suspend fun getLastEntry(): Int
+
     @Query("SELECT * FROM Participant WHERE name IS :name")
     suspend fun getParticipantEntries(name: String): List<ParticipantEntries>
 

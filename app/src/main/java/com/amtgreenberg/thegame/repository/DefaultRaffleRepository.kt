@@ -6,6 +6,9 @@ import com.amtgreenberg.thegame.di.IoDispatcher
 import com.amtgreenberg.thegame.model.Entry
 import com.amtgreenberg.thegame.model.Participant
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
+import java.lang.Exception
+import java.time.OffsetDateTime
 
 /**
  * Default implementation of the repository: [RaffleRepository]. This handles all the logical
@@ -18,7 +21,14 @@ class DefaultRaffleRepository(
 ) : RaffleRepository {
 
     override suspend fun addEntry(participant: Participant): ResultData<Entry> {
-        TODO("Not yet implemented")
+        return try {
+            val nextEntry = raffleDao.getLastEntry() + 1
+            val entry = Entry(nextEntry, participant.name, OffsetDateTime.now())
+            withContext(ioDispatcher) { raffleDao.insertEntry(entry) }
+            ResultData.Success(entry)
+        } catch (e: Exception) {
+            ResultData.Error(e)
+        }
     }
 
     override suspend fun addParticipant(name: Participant): ResultData<Entry> {
