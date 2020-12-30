@@ -78,7 +78,62 @@ class DefaultRaffleRepository(
     }
 
     override suspend fun obtainRaffleWinner(shouldFinalizeAfterSelection: Boolean): ResultData<Entry> {
-        TODO("Not yet implemented")
+        return try {
+            val now = OffsetDateTime.now()
+            val lastMonth = now.month.minus(1L)
+            val thisMonthsEntries = raffleDao.getValidEntries().filter {
+                it.date.isAfter(OffsetDateTime.from(lastMonth))
+            }
+
+            // Build the set of entries
+            val raffleEntries = thisMonthsEntries.toMutableList().apply {
+                thisMonthsEntries.forEach {
+                    addAll(
+                        raffleDao.getActiveParticipantEntries(it.participantName)
+                    )
+                }
+            }
+
+            val winner = getWinner(raffleEntries)
+
+            // If we want to finalize this, set all the winner's previous entries to invalid
+            if (shouldFinalizeAfterSelection) {
+                withContext(ioDispatcher) {
+                    raffleDao.updateEntry(
+                        Entry(
+                            winner.entryNumber,
+                            winner.participantName,
+                            winner.date,
+                            false,
+                            dateWon = now
+                        )
+                    )
+                    raffleEntries
+                        .stream()
+                        .filter {
+                            it.participantName == winner.participantName && it.entryNumber != winner.entryNumber
+                        }
+                        .forEach {
+                            raffleDao.updateEntry(
+                                Entry(
+                                    it.entryNumber,
+                                    it.participantName,
+                                    it.date,
+                                    false
+                                )
+                            )
+                        }
+                }
+            }
+
+            ResultData.Success(winner)
+        } catch (e: Exception) {
+            ResultData.Error(e)
+        }
+    }
+
+    private fun getWinner(raffleEntries: MutableList<Entry>): Entry {
+
     }
 
     /**
