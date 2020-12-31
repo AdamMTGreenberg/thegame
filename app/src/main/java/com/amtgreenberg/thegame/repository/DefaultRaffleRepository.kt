@@ -23,7 +23,7 @@ class DefaultRaffleRepository(
 
     override suspend fun addEntry(participant: Participant): ResultData<Entry> {
         return try {
-            val nextEntry = raffleDao.getLastEntry() + 1
+            val nextEntry = raffleDao.getLastEntry().entryNumber + 1
 
             // If no entries exist, add the participant
             if (raffleDao.getParticipantEntries(participant.name).isEmpty()) {

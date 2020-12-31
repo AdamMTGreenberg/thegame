@@ -5,5 +5,5 @@ import java.io.Serializable
 
 @Entity(tableName = "Participant", primaryKeys = ["name"])
 data class Participant(
-    val name: String,
+    val name: String
 ) : Serializable

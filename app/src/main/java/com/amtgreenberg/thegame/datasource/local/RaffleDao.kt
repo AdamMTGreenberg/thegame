@@ -23,7 +23,7 @@ interface RaffleDao {
     suspend fun getEntries(): List<Entry>
 
     @Query("SELECT * FROM Entry ORDER BY entry_number DESC LIMIT 1")
-    suspend fun getLastEntry(): Int
+    suspend fun getLastEntry(): Entry
 
     @Query("SELECT * FROM Entry WHERE is_valid = 1")
     suspend fun getValidEntries(): List<Entry>
@@ -31,7 +31,7 @@ interface RaffleDao {
     @Query("SELECT * FROM Participant WHERE name IS :name")
     suspend fun getParticipantEntries(name: String): List<ParticipantEntries>
 
-    @Query("SELECT * FROM Entry WHERE Entry.participant_name IS :name AND Entry.is_valid = 1")
+    @Query("SELECT * FROM Entry WHERE participant_name IS :name AND is_valid = 1")
     suspend fun getActiveParticipantEntries(name: String): List<Entry>
 
     /**********************************************************
