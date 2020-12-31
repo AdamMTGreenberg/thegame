@@ -23,7 +23,7 @@ interface RaffleDao {
     suspend fun getEntries(): List<Entry>
 
     @Query("SELECT * FROM Entry ORDER BY entry_number DESC LIMIT 1")
-    suspend fun getLastEntry(): Entry
+    suspend fun getLastEntry(): Entry?
 
     @Query("SELECT * FROM Entry WHERE is_valid = 1")
     suspend fun getValidEntries(): List<Entry>

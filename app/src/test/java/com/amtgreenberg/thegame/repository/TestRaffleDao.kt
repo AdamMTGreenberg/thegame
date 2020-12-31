@@ -4,7 +4,6 @@ import com.amtgreenberg.thegame.datasource.local.RaffleDao
 import com.amtgreenberg.thegame.model.Entry
 import com.amtgreenberg.thegame.model.Participant
 import com.amtgreenberg.thegame.model.ParticipantEntries
-import java.lang.IllegalArgumentException
 
 class TestRaffleDao : RaffleDao {
 
@@ -15,8 +14,7 @@ class TestRaffleDao : RaffleDao {
 
     override suspend fun getEntries(): List<Entry> = entries
 
-    override suspend fun getLastEntry(): Entry =
-        entries.maxBy { it.entryNumber } ?: throw IllegalArgumentException("No valid entries")
+    override suspend fun getLastEntry(): Entry? = entries.maxBy { it.entryNumber }
 
     override suspend fun getValidEntries(): List<Entry> = entries.filter { it.isValid }
 
