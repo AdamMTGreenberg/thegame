@@ -47,6 +47,7 @@ dependencies {
     def google_truth = "1.0"
     def lifecycle_version = "2.2.0"
     def junit_version = "4.13.1"
+    def kotlinx_co_test_version = "1.4.2"
     def material_version = "1.2.1"
     def recyclerview_version = "1.1.0"
     def retrofit2_version = "2.9.0"
@@ -63,6 +64,7 @@ dependencies {
     testImplementation "junit:junit:$junit_version"
     testImplementation "com.google.truth:truth:$google_truth"
     testImplementation "android.arch.core:core-testing:$core_testing"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinx_co_test_version"
     androidTestImplementation "androidx.test:runner:$test_runner_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
 
