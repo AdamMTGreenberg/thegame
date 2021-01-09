@@ -2,6 +2,8 @@ package com.amtgreenberg.thegame.repository
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import assertk.assertThat
+import assertk.assertions.containsOnly
+import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import com.amtgreenberg.thegame.data.ResultData
 import com.amtgreenberg.thegame.datasource.local.RaffleDao
@@ -46,8 +48,9 @@ class DefaultRaffleRepositoryTest {
         Entry(3, "Roy", currentTime),
         Entry(4, "Henry", currentTime)
     )
+    private val firstParticipant = Participant("Adam")
     private val testParticipants = arrayOf(
-        Participant("Adam"),
+        firstParticipant,
         Participant("Dan"),
         Participant("Roy"),
         Participant("Henry")
@@ -107,10 +110,52 @@ class DefaultRaffleRepositoryTest {
 
     @Test
     fun addParticipant() {
+        runBlocking {
+            when (val result = raffleRepository.addParticipant(testParticipants[0])) {
+                is ResultData.Success -> {
+                    assertThat(result.data.name).isEqualTo(testParticipants[0].name)
+                    assertThat((raffleDao as TestRaffleDao).participants)
+                        .containsOnly(firstParticipant)
+                }
+                is ResultData.Error -> {
+                    fail(result.exception.message)
+                }
+            }
+        }
     }
 
     @Test
     fun addParticipantEntries() {
+        (raffleDao as TestRaffleDao).participants.addAll(testParticipants)
+
+        runBlocking {
+            val entryIds = listOf(3, 70, 12, 29)
+            when (val results = raffleRepository.addParticipantEntries(testParticipants[0], entryIds)) {
+                is ResultData.Success -> {
+                    assertThat(results.data).hasSize(entryIds.size)
+                    val sortedEntryIds = entryIds.sortedDescending()
+                    sortedEntryIds.forEachIndexed { index, id ->
+                        
+                    }
+
+                }
+                is ResultData.Error -> {
+                    fail(results.exception.message)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun addNewParticipantEntries() {
+    }
+
+    @Test
+    fun addParticipantEntriesOffsetMonthNonDefault() {
+    }
+
+    @Test
+    fun addParticipantEntriesUnsortedEntryIds() {
     }
 
     @Test
